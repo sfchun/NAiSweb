@@ -1,0 +1,35 @@
+#
+# config file
+# follow yml format
+# 
+
+NAiSweb:
+  global:
+     debug: "no"
+
+  archive:
+     arc_path1: "/mnt/Archives/"
+     arc_path2: ""
+     arc_path3: ""
+
+  audio:
+     aud_path1: "/mnt/Multimedia/audio/"
+     aud_path2: ""
+     aud_path3: ""
+
+  movie:
+     mov_path1: "/mnt/Multimedia/movies/"
+     mov_path2: ""
+     mov_path3: ""
+
+  picture:
+     pic_path1: "/mnt/Multimedia/Images/"
+     pic_path2: ""
+     pic_path3: ""
+
+  video:
+     vid_path1: "/mnt/Multimedia/videos/"
+     vid_path2: ""
+     vid_path3: ""
+
+
