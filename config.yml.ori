@@ -8,28 +8,77 @@ NAiSweb:
      debug: "no"
 
   archive:
-     arc_path1: "/mnt/Archives/"
-     arc_path2: ""
-     arc_path3: ""
+    path:
+      arc_path1: "/mnt/storz2_pool/Archives/"
+      arc_path2: ""
+      arc_path3: ""
+    supported:
+      - exe
+      - msi
+      - iso
+      - rar
+      - zip
+      - 7z
+      - img
+      - tar
+      - gz
+      - sh
 
   audio:
-     aud_path1: "/mnt/Multimedia/audio/"
-     aud_path2: ""
-     aud_path3: ""
+    path:
+      aud_path1: "/mnt/storz2_pool/Multimedia/audio/"
+      aud_path2: ""
+      aud_path3: ""
+    supported:
+      - flac
+      - vqf
+      - mp3
+      - wav
+      - ogg
 
   movie:
-     mov_path1: "/mnt/Multimedia/movies/"
-     mov_path2: ""
-     mov_path3: ""
+    path:
+      mov_path1: "/mnt/storz2_pool/Multimedia/movies/"
+      mov_path2: ""
+      mov_path3: ""
+    supported:
+      - mp4
+      - avi
+      - mkv
+      - m2ts
+      - wmv
+      - mpg
+      - mpeg
+      - divx
+      - iso
 
   picture:
-     pic_path1: "/mnt/Multimedia/Images/"
-     pic_path2: ""
-     pic_path3: ""
+    path:
+      pic_path1: "/mnt/storz2_pool/Multimedia/Images/"
+      pic_path2: ""
+      pic_path3: ""
+    supported:
+      - jpg
+      - png
+      - gif
+      - raw
+      - jpeg
+      - bmp
+      - tiff
 
   video:
-     vid_path1: "/mnt/Multimedia/videos/"
-     vid_path2: ""
-     vid_path3: ""
+    path:
+      vid_path1: "/mnt/storz2_pool/Multimedia/videos/"
+      vid_path2: ""
+      vid_path3: ""
+    supported:
+      - mp4
+      - avi
+      - mkv
+      - wmv
+      - mpg
+      - mpeg
+      - divx
+      - webm
 
 

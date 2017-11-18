@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ConfigFile="config"
+ConfigFile="config.yml"
 
 
 ##########
@@ -10,32 +10,56 @@ func_exit_error() {
 }
 
 function parse_yaml {
-   local prefix=$2
-   local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
-   sed -ne "s|^\($s\):|\1|" \
-        -e "s|^\($s\)\($w\)$s:$s[\"']\(.*\)[\"']$s\$|\1$fs\2$fs\3|p" \
-        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  $1 |
-   awk -F$fs '{
-      indent = length($1)/2;
-      vname[indent] = $2;
-      for (i in vname) {if (i > indent) {delete vname[i]}}
-      if (length($3) > 0) {
-         vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
-         printf("%s%s%s=\"%s\"\n", "'$prefix'",vn, $2, $3);
-      }
-   }'
+  local prefix=$2
+    local s
+    local w
+    local fs
+    s='[[:space:]]*'
+    w='[a-zA-Z0-9_]*'
+    fs="$(echo @|tr @ '\034')"
+    sed -ne "s|^\($s\)\($w\)$s:$s\"\(.*\)\"$s\$|\1$fs\2$fs\3|p" \
+        -e "s|^\($s\)\($w\)$s[:-]$s\(.*\)$s\$|\1$fs\2$fs\3|p" "$1" |
+    awk -F"$fs" '{
+    indent = length($1)/2;
+    vname[indent] = $2;
+    for (i in vname) {if (i > indent) {delete vname[i]}}
+        if (length($3) > 0) {
+            vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
+            printf("%s%s%s=(\"%s\")\n", "'"$prefix"'",vn, $2, $3);
+        }
+    }' | sed 's/_=/+=/g'
 }
 
+func_get_arc_files() {
+  for value in "${ArchivePath_array[@]}"; do
+    find "${!value}/" > toto
+  done
+}
+
+func_get_aud_files() {
+ :
+}
+
+func_get_pic_files() {
+ :
+}
+
+func_get_vidmov_files() {
+ :
+}
+
+
 # Main
+#parse_yaml config.yml
 echo -en "\nparsing config.yml ..."
 eval $(parse_yaml "${ConfigFile}")
 
 # set yml path(s) (NAiSweb_) in array(s)
-ArchivePath_array=($(compgen -v | grep '^NAiSweb_archive__'))
-AudioPath_array=($(compgen -v | grep '^NAiSweb_audio__'))
-MoviePath_array=($(compgen -v | grep '^NAiSweb_movie__'))
-PicturePath_array=($(compgen -v | grep '^NAiSweb_picture__'))
-VideoPath_array=($(compgen -v | grep '^NAiSweb_video__'))
+ArchivePath_array=($(compgen -v | grep '^NAiSweb_archive_path_'))
+AudioPath_array=($(compgen -v | grep '^NAiSweb_audio_path_'))
+MoviePath_array=($(compgen -v | grep '^NAiSweb_movie_path_'))
+PicturePath_array=($(compgen -v | grep '^NAiSweb_picture_path_'))
+VideoPath_array=($(compgen -v | grep '^NAiSweb_video_path_'))
 
 # Keep only valid path(s) from array(s)
 echo -en "\nsearching config for valid path(s)\n"
@@ -53,9 +77,10 @@ echo "Picture path(s) ..."; for AEpicture in "${PicturePath_array[@]}"; do echo 
 echo "Video path(s) ..."; for AEvideo in "${VideoPath_array[@]}"; do echo "${!AEvideo}"; done
 
 # If paths exists create data/... directory tree and generate/store flat data
-if [ ! -z "${ArchivePath_array}" ]; then mkdir -p data/arc; fi
-if [ ! -z "${AudioPath_array}" ]; then mkdir -p data/aud; fi
-if [ ! -z "${MoviePath_array}" ]; then mkdir -p data/mov; fi
-if [ ! -z "${PicturePath_array}" ]; then mkdir -p data/pic; fi
-if [ ! -z "${VideoPath_array}" ]; then mkdir -p data/vid; fi
+if [ ! -z "${ArchivePath_array}" ]; then mkdir -p data/arc && cd data/arc/ && func_get_arc_files; cd - >/dev/null ; fi
+if [ ! -z "${AudioPath_array}" ]; then mkdir -p data/aud && cd data/aud/ && func_get_aud_files; cd - >/dev/null ; fi
+if [ ! -z "${MoviePath_array}" ]; then mkdir -p data/mov && cd data/mov/ && func_get_vidmov_files; cd - >/dev/null ; fi
+if [ ! -z "${PicturePath_array}" ]; then mkdir -p data/pic && cd data/pic/ && func_get_pic_files; cd - >/dev/null ; fi
+if [ ! -z "${VideoPath_array}" ]; then mkdir -p data/vid && cd data/vid/ && func_get_vidmov_files; cd - >/dev/null ; fi
 
+echo ""
