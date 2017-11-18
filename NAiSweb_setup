@@ -30,7 +30,7 @@ function parse_yaml {
 echo -en "\nparsing config.yml ..."
 eval $(parse_yaml "${ConfigFile}")
 
-# register yml path(s) in array(s)
+# set yml path(s) (NAiSweb_) in array(s)
 ArchivePath_array=($(compgen -v | grep '^NAiSweb_archive__'))
 AudioPath_array=($(compgen -v | grep '^NAiSweb_audio__'))
 MoviePath_array=($(compgen -v | grep '^NAiSweb_movie__'))
