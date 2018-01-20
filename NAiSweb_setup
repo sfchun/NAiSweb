@@ -6,22 +6,71 @@ TempDir="/temp/.NAiSweb"
 
 ##########
 
+
+defineColors() {
+  # defineColors() define colors used when called
+  # Typical use: call the function if ${color}="color"
+
+  #TERM='xterm'; export TERM
+  TERM='xterm-256color'; export TERM
+
+  reset=$(tput setaf 7)
+  bold=$(tput bold)
+  blue=$(tput setaf 4)
+  dim=$(tput setaf 0)
+  green=$(tput setaf 2)
+  red=$(tput setaf 1)
+  yellow=$(tput setaf 3)
+}
+
+function tag() {
+  # tag() output a colored tag followed by optional $2 as message like: [ TAG ] $2
+  # comment tag diplayed only when global ${verbose}="verbose"
+  # b|blue|info) INFO # c|comment|debug) DEBUG # y|yellow|warning) WARNING
+  # g|green|ok) OK # r|red|error) ERROR
+
+  defineColors
+
+  local label
+  local email_label
+  local display="display"
+  case $1 in
+    b|blue|info) label="${blue:-}INFO"; email_label="INFO" ;;
+    c|comment|debug) label="${dim:-}DEBUG" ; email_label="DEBUG" ; [[ ${verbose:-} != "verbose" ]] && display="no" ;;
+    g|green|ok) label="${green:-}OK" ; email_label="OK" ;;
+    r|red|error) label="${bold:-}${red:-}ERROR" ; email_label="ERROR" ;;
+    y|yellow|warning) label="${yellow:-}WARNING"; email_label="WARNING" ;;
+    *) echo "ERROR 'tag $@' is invalid" ;;
+  esac
+  shift # remove $1 to use $@
+  if [[ -z "${1:-}" ]]; then
+    message=" " # no message, tag only
+  else
+    message="$@" # every argument will be displayed after the tag
+  fi
+  if [[ ${display} == "display" ]]; then
+    grep -q 'ERROR' <<< "${label}" && echo -ne "${dim:-}[ ${label} ${dim:-}]${reset:-} ${message}" 1>&2 || echo -ne "${dim:-}[ ${label} ${dim:-}]${reset:-} ${message}"
+    if [ ! -z "${CFOPS_LOG}" ]; then echo -ne "[ ${email_label} ] ${message}" >> "${CFOPS_LOG}"; fi
+  fi
+}
+
 function exit_error() {
   cd "${CurentDir}/"; rm -Rf "${TempDir}"
   exit 1
 }
 
 function ctrl_c() {
-  echo ""; echo "! execution interrupted !"; echo ""
+  tag warning "! execution interrupted !\n"
   exit_error
 }
 
 function check_prereq() {
-  if [ ! -f "./bin/yaml2json" ] ; then echo "yaml2json is not present"; exit_error ; fi
-  if ! jq --version > /dev/null 2>&1 ; then echo -e "jq is not installed\n try : \nsudo apt-get install jq"; exit_error ; fi
+  if [ ! -f "./bin/yaml2json" ] ; then tag error "yaml2json is not present\n"; exit_error ; fi
+  if ! jq --version > /dev/null 2>&1 ; then tag error "jq is not installed\n try : \nsudo apt-get install jq\n"; exit_error ; fi
 }
 
 # Main
+tag info "$(basename $0)\n"
 PATH="${PATH};${CurentDir}/bin"
 
 # trap ctrl-c and call ctrl_c()
@@ -33,4 +82,4 @@ check_prereq
 
 echo ""
 cd "${CurentDir}/"; rm -Rf "${TempDir}"
-exit 0
+tag ok "Done.\n"
