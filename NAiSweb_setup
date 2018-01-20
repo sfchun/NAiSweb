@@ -11,7 +11,7 @@ verbose="noverbose"
 ########## End Declare section
 
 
-defineColors() {
+function defineColors() {
   # defineColors() define colors used when called
   # Typical use: call the function if ${color}="color"
 
@@ -65,47 +65,73 @@ function exit_error() {
 }
 
 function ctrl_c() {
-  tag warning "! execution interrupted !\n"
+  tag warning "\n\t! execution interrupted !\n"
   exit_error
 }
 
-function check_prereq() {
-  # packages/bin checks
-  tag info "packages/bin checks\n"
+function check_prerequisites_and_cleanup_old_data() {
+  # prerequisites checks
   if [ ! -f "./bin/yaml2json" ] ; then tag error "yaml2json is not present\n"; exit_error ; fi
   if ! jq --version > /dev/null 2>&1 ; then tag error "jq is not installed\n try : \nsudo apt-get install jq\n"; exit_error ; fi
-  tag ok "\n"
+  tag ok "prerequisites checks\n"
 
   # cleanup previous data if exists
-  # and regenerate temp/data directory structure
-  tag warning "cleanup previous data if exists\n\t then regenerate temp/data directory structure\n"
-
-  local DataDirArray=( "arc" "aud" "mov" "pic" "vid" )
-  for dtype in ${DataDirArray[@]}; do
-    mkdir -p "${DataDir}/${dtype}"
-    if [ ! -d "${DataDir}/${dtype}" ]; then tag error "Could not create directory : ${DataDir}/${dtype}\n"; else rm -Rf ${DataDir}/${dtype}/* || tag error "Couldnot clean content in : ${DataDir}/${dtype}/"; fi
-  done
+  if [ -d "${DataDir}" ]; then
+    if ! rm -Rf ${DataDir}/* ; then tag error "Could not clean ${DataDir} data directory content\n"; else tag ok "cleaned ${DataDir} data directory content\n"; fi
+  else
+    if ! mkdir -p "${DataDir}" ; then tag error "Could not find and create ${DataDir} data directory\n"; else tag ok "created ${DataDir} data directory\n"; fi
+  fi
+  
   #mkdir -p "${TempDir}"; if [ ! -d "${TempDir}" ]; then tag error "Could not create temporary directory : ${TempDir}\n"; fi
-  tag ok "\n" 
 
   # check config file
   if [ ! -r "${ConfigFile}" ]; then tag error "Could not read config file : ${ConfigFile}\n"; fi
 }
 
+function generate_data_from_paths() {
+  string=$1 ; Afiletype=($@)
+
+  # loop file types, if include path is not empty and valide then generate tree in data directory
+  for dtype in ${Afiletype[@]}; do
+    tag info "fetching files from ${dtype}...\n"
+  done
+
+}
+
+function fetch_file_types_and_generate_data_tree() {
+  # fetch file types from config.yml
+  # Put file types (archive, audio, movie...) in array 
+  declare -a Afiletype=($(yaml2json < "${ConfigFile}" | jq -r '.config | .[] | .filetype'))
+  if [ -z "${Afiletype}" ]; then
+    tag error "Error getting file type from config.yml file\n"
+  else
+    tag ok "file type(s) fetched.\n"
+    tag info "${Afiletype[@]}\n"
+  fi
+
+  # and regenerate temp/data directory structure
+  for dtype in ${Afiletype[@]}; do
+    if ! mkdir -p "${DataDir}/${dtype}" ; then tag error "Could not create directory : ${DataDir}/${dtype}\n"; fi
+  done
+  tag ok "generated data directory structure\n"
+
+  generate_data_from_paths "${Afiletype[@]}"
+}
+
+
 # Main
 CurentDir="$(pwd)"
-tag info "$(basename $0)\n"
-PATH="${PATH};${CurentDir}/bin"
+echo -e "\n$(basename $0)"
+PATH="${PATH}:${CurentDir}/bin"
 
 # trap ctrl-c and call ctrl_c()
 trap ctrl_c INT
 
-# prerequisite checks
-check_prereq
+check_prerequisites_and_cleanup_old_data
+fetch_file_types_and_generate_data_tree
 
 
 echo ""
 cd "${CurentDir}/"
 #rm -Rf "${TempDir}"
-tag ok "Enjoy !\n"
-
+echo -e "Enjoy !\n"

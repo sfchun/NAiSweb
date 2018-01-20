@@ -1,84 +1,37 @@
-NAiSweb:
-  config:
-    archive:
-      path:
-        include:
-          - "/Archives/"
-        excludde:
-      format:
-        supported:
-          - .exe
-          - .msi
-          - .iso
-          - .rar
-          - .zip
-          - .7z
-          - .img
-          - .tar
-          - .gz
-          - .sh
+---
+config:
+  archive:
+    filetype: archive
+    includepath:
+      - "/mnt/Archives"
+    excluddepath:
+    supportedformat: [ '.exe', '.msi', '.iso', '.rar', '.zip', '.7z', '.img', '.tar', '.gz', '.sh' ]
 
-    audio:
-      path:
-        include:
-          - "/Audio/"
-        exclude:
-      format:
-        supported:
-          - .flac
-          - .vqf
-          - .mp3
-          - .wav
-          - .ogg
+  audio:
+    filetype: audio
+    includepath:
+      - "/mnt/Audio"
+    excludepath:
+    supportedformat: [ '.flac', '.vqf', '.mp3', '.wav', '.ogg' ]
 
-    movie:
-      path:
-        include:
-          - "/Movies/"
-        exclude:
-      format:
-        supported:
-          - .mp4
-          - .avi
-          - .mkv
-          - .m2ts
-          - .wmv
-          - .mpg
-          - .mpeg
-          - .divx
-          - .iso
-          - .h265
-          - .h264
+  movie:
+    filetype: movie
+    includepath:
+      - "/mnt/Movies"
+    excludepath:
+    supportedformat: [ '.mp4', '.avi', '.mkv', '.m2ts', '.wmv', '.mpg', '.mpeg', '.divx', '.iso', '.h265', '.h264' ]
 
-    picture:
-      path:
-        include:
-          - "/Images/"
-        exclude:
-      format:
-        supported:
-          - .jpg
-          - .png
-          - .gif
-          - .raw
-          - .jpeg
-          - .bmp
-          - .tiff
+  picture:
+    filetype: picture
+    includepath:
+      - "/mnt/Pictures"
+    excludepath:
+    supportedformat: [ '.jpg', '.png', '.gif', '.raw', '.jpeg', '.bmp', '.tiff' ]
 
-    video:
-      path:
-        include:
-          - "/Videos/"
-        exclude:
-      format:
-        supported:
-          - .mp4
-          - .avi
-          - .mkv
-          - .wmv
-          - .mpg
-          - .mpeg
-          - .divx
-          - .webm
-
+  video:
+    filetype: video
+    includepath:
+      - "/mnt/Videos"
+    excludepath:
+    supportedformat: [ '.mp4', '.avi', '.mkv', '.wmv', '.mpg', '.mpeg', '.divx', '.webm' ]
 
