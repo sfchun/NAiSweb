@@ -1,90 +1,84 @@
-#
-# config file
-# follow yml format
-# 
-
 NAiSweb:
-  debug: "no"
+  config:
+    archive:
+      path:
+        include:
+          - "/Archives/"
+        excludde:
+      format:
+        supported:
+          - .exe
+          - .msi
+          - .iso
+          - .rar
+          - .zip
+          - .7z
+          - .img
+          - .tar
+          - .gz
+          - .sh
 
-  archive:
-    path:
-      include:
-        - "/Archives/"
-      excludde:
-    format:
-      supported:
-        - .exe
-        - .msi
-        - .iso
-        - .rar
-        - .zip
-        - .7z
-        - .img
-        - .tar
-        - .gz
-        - .sh
+    audio:
+      path:
+        include:
+          - "/Audio/"
+        exclude:
+      format:
+        supported:
+          - .flac
+          - .vqf
+          - .mp3
+          - .wav
+          - .ogg
 
-  audio:
-    path:
-      include:
-        - "/Audio/"
-      exclude:
-    format:
-      supported:
-        - .flac
-        - .vqf
-        - .mp3
-        - .wav
-        - .ogg
+    movie:
+      path:
+        include:
+          - "/Movies/"
+        exclude:
+      format:
+        supported:
+          - .mp4
+          - .avi
+          - .mkv
+          - .m2ts
+          - .wmv
+          - .mpg
+          - .mpeg
+          - .divx
+          - .iso
+          - .h265
+          - .h264
 
-  movie:
-    path:
-      include:
-        - "/Movies/"
-      exclude:
-    format:
-      supported:
-        - .mp4
-        - .avi
-        - .mkv
-        - .m2ts
-        - .wmv
-        - .mpg
-        - .mpeg
-        - .divx
-        - .iso
-        - .h265
-        - .h264
+    picture:
+      path:
+        include:
+          - "/Images/"
+        exclude:
+      format:
+        supported:
+          - .jpg
+          - .png
+          - .gif
+          - .raw
+          - .jpeg
+          - .bmp
+          - .tiff
 
-  picture:
-    path:
-      include:
-        - "/Images/"
-      exclude:
-    format:
-      supported:
-        - .jpg
-        - .png
-        - .gif
-        - .raw
-        - .jpeg
-        - .bmp
-        - .tiff
-
-  video:
-    path:
-      include:
-        - "/Videos/"
-      exclude:
-    format:
-      supported:
-        - .mp4
-        - .avi
-        - .mkv
-        - .wmv
-        - .mpg
-        - .mpeg
-        - .divx
-        - .webm
+    video:
+      path:
+        include:
+          - "/Videos/"
+        exclude:
+      format:
+        supported:
+          - .mp4
+          - .avi
+          - .mkv
+          - .wmv
+          - .mpg
+          - .mpeg
+          - .divx
+          - .webm
 
 

@@ -1,10 +1,14 @@
 #!/bin/bash
 
-ConfigFile="config.yml"
-CurentDir="$(pwd)"
-TempDir="/temp/.NAiSweb"
+########## Declare section
 
-##########
+ConfigFile="config.yml"
+TempDir="/tmp/.NAiSweb" # not used yet
+DataDir="NAiSweb_Data"
+# verbose switch : verbose|noverbose
+verbose="noverbose"
+
+########## End Declare section
 
 
 defineColors() {
@@ -55,7 +59,8 @@ function tag() {
 }
 
 function exit_error() {
-  cd "${CurentDir}/"; rm -Rf "${TempDir}"
+  cd "${CurentDir}/";
+  #rm -Rf "${TempDir}"
   exit 1
 }
 
@@ -65,11 +70,30 @@ function ctrl_c() {
 }
 
 function check_prereq() {
+  # packages/bin checks
+  tag info "packages/bin checks\n"
   if [ ! -f "./bin/yaml2json" ] ; then tag error "yaml2json is not present\n"; exit_error ; fi
   if ! jq --version > /dev/null 2>&1 ; then tag error "jq is not installed\n try : \nsudo apt-get install jq\n"; exit_error ; fi
+  tag ok "\n"
+
+  # cleanup previous data if exists
+  # and regenerate temp/data directory structure
+  tag warning "cleanup previous data if exists\n\t then regenerate temp/data directory structure\n"
+
+  local DataDirArray=( "arc" "aud" "mov" "pic" "vid" )
+  for dtype in ${DataDirArray[@]}; do
+    mkdir -p "${DataDir}/${dtype}"
+    if [ ! -d "${DataDir}/${dtype}" ]; then tag error "Could not create directory : ${DataDir}/${dtype}\n"; else rm -Rf ${DataDir}/${dtype}/* || tag error "Couldnot clean content in : ${DataDir}/${dtype}/"; fi
+  done
+  #mkdir -p "${TempDir}"; if [ ! -d "${TempDir}" ]; then tag error "Could not create temporary directory : ${TempDir}\n"; fi
+  tag ok "\n" 
+
+  # check config file
+  if [ ! -r "${ConfigFile}" ]; then tag error "Could not read config file : ${ConfigFile}\n"; fi
 }
 
 # Main
+CurentDir="$(pwd)"
 tag info "$(basename $0)\n"
 PATH="${PATH};${CurentDir}/bin"
 
@@ -81,5 +105,7 @@ check_prereq
 
 
 echo ""
-cd "${CurentDir}/"; rm -Rf "${TempDir}"
-tag ok "Done.\n"
+cd "${CurentDir}/"
+#rm -Rf "${TempDir}"
+tag ok "Enjoy !\n"
+
