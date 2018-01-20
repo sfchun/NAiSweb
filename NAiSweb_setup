@@ -1,86 +1,36 @@
 #!/bin/bash
 
 ConfigFile="config.yml"
-
+CurentDir="$(pwd)"
+TempDir="/temp/.NAiSweb"
 
 ##########
 
-func_exit_error() {
-   exit 1
+function exit_error() {
+  cd "${CurentDir}/"; rm -Rf "${TempDir}"
+  exit 1
 }
 
-function parse_yaml {
-  local prefix=$2
-    local s
-    local w
-    local fs
-    s='[[:space:]]*'
-    w='[a-zA-Z0-9_]*'
-    fs="$(echo @|tr @ '\034')"
-    sed -ne "s|^\($s\)\($w\)$s:$s\"\(.*\)\"$s\$|\1$fs\2$fs\3|p" \
-        -e "s|^\($s\)\($w\)$s[:-]$s\(.*\)$s\$|\1$fs\2$fs\3|p" "$1" |
-    awk -F"$fs" '{
-    indent = length($1)/2;
-    vname[indent] = $2;
-    for (i in vname) {if (i > indent) {delete vname[i]}}
-        if (length($3) > 0) {
-            vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
-            printf("%s%s%s=(\"%s\")\n", "'"$prefix"'",vn, $2, $3);
-        }
-    }' | sed 's/_=/+=/g'
+function ctrl_c() {
+  echo ""; echo "! execution interrupted !"; echo ""
+  exit_error
 }
 
-func_get_arc_files() {
-  for value in "${ArchivePath_array[@]}"; do
-    find "${!value}/" > toto
-  done
+function check_prereq() {
+  if [ ! -f "./bin/yaml2json" ] ; then echo "yaml2json is not present"; exit_error ; fi
+  if ! jq --version > /dev/null 2>&1 ; then echo -e "jq is not installed\n try : \nsudo apt-get install jq"; exit_error ; fi
 }
-
-func_get_aud_files() {
- :
-}
-
-func_get_pic_files() {
- :
-}
-
-func_get_vidmov_files() {
- :
-}
-
 
 # Main
-#parse_yaml config.yml
-echo -en "\nparsing config.yml ..."
-eval $(parse_yaml "${ConfigFile}")
+PATH="${PATH};${CurentDir}/bin"
 
-# set yml path(s) (NAiSweb_) in array(s)
-ArchivePath_array=($(compgen -v | grep '^NAiSweb_archive_path_'))
-AudioPath_array=($(compgen -v | grep '^NAiSweb_audio_path_'))
-MoviePath_array=($(compgen -v | grep '^NAiSweb_movie_path_'))
-PicturePath_array=($(compgen -v | grep '^NAiSweb_picture_path_'))
-VideoPath_array=($(compgen -v | grep '^NAiSweb_video_path_'))
+# trap ctrl-c and call ctrl_c()
+trap ctrl_c INT
 
-# Keep only valid path(s) from array(s)
-echo -en "\nsearching config for valid path(s)\n"
-t_ArchivePath_array=(); for value in "${ArchivePath_array[@]}"; do if [ -d "${!value}" ]; then t_ArchivePath_array+=($value); fi; done; ArchivePath_array=("${t_ArchivePath_array[@]}"); unset t_ArchivePath_array
-t_AudioPath_array=(); for value in "${AudioPath_array[@]}"; do if [ -d "${!value}" ]; then t_AudioPath_array+=($value); fi; done; AudioPath_array=("${t_AudioPath_array[@]}"); unset t_AudioPath_array
-t_MoviePath_array=(); for value in "${MoviePath_array[@]}"; do if [ -d "${!value}" ]; then t_MoviePath_array+=($value); fi; done; MoviePath_array=("${t_MoviePath_array[@]}"); unset t_MoviePath_array
-t_PicturePath_array=(); for value in "${PicturePath_array[@]}"; do if [ -d "${!value}" ]; then t_PicturePath_array+=($value); fi; done; PicturePath_array=("${t_PicturePath_array[@]}"); unset t_PicturePath_array
-t_VideoPath_array=(); for value in "${VideoPath_array[@]}"; do if [ -d "${!value}" ]; then t_VideoPath_array+=($value); fi; done; VideoPath_array=("${t_VideoPath_array[@]}"); unset t_VideoPath_array
+# prerequisite checks
+check_prereq
 
-# Display valid path(s) found
-echo "Archive path(s) ..."; for AEarchive in "${ArchivePath_array[@]}"; do echo "${!AEarchive}"; done
-echo "Audio path(s) ..."; for AEaudio in "${AudioPath_array[@]}"; do echo "${!AEaudio}"; done
-echo "Movie path(s) ..."; for AEmovie in "${MoviePath_array[@]}"; do echo "${!AEmovie}"; done
-echo "Picture path(s) ..."; for AEpicture in "${PicturePath_array[@]}"; do echo "${!AEpicture}"; done
-echo "Video path(s) ..."; for AEvideo in "${VideoPath_array[@]}"; do echo "${!AEvideo}"; done
-
-# If paths exists create data/... directory tree and generate/store flat data
-if [ ! -z "${ArchivePath_array}" ]; then mkdir -p data/arc && cd data/arc/ && func_get_arc_files; cd - >/dev/null ; fi
-if [ ! -z "${AudioPath_array}" ]; then mkdir -p data/aud && cd data/aud/ && func_get_aud_files; cd - >/dev/null ; fi
-if [ ! -z "${MoviePath_array}" ]; then mkdir -p data/mov && cd data/mov/ && func_get_vidmov_files; cd - >/dev/null ; fi
-if [ ! -z "${PicturePath_array}" ]; then mkdir -p data/pic && cd data/pic/ && func_get_pic_files; cd - >/dev/null ; fi
-if [ ! -z "${VideoPath_array}" ]; then mkdir -p data/vid && cd data/vid/ && func_get_vidmov_files; cd - >/dev/null ; fi
 
 echo ""
+cd "${CurentDir}/"; rm -Rf "${TempDir}"
+exit 0

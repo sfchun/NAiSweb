@@ -4,81 +4,87 @@
 # 
 
 NAiSweb:
-  global:
-     debug: "no"
+  debug: "no"
 
   archive:
     path:
-      arc_path1: "/mnt/storz2_pool/Archives/"
-      arc_path2: ""
-      arc_path3: ""
-    supported:
-      - exe
-      - msi
-      - iso
-      - rar
-      - zip
-      - 7z
-      - img
-      - tar
-      - gz
-      - sh
+      include:
+        - "/Archives/"
+      excludde:
+    format:
+      supported:
+        - .exe
+        - .msi
+        - .iso
+        - .rar
+        - .zip
+        - .7z
+        - .img
+        - .tar
+        - .gz
+        - .sh
 
   audio:
     path:
-      aud_path1: "/mnt/storz2_pool/Multimedia/audio/"
-      aud_path2: ""
-      aud_path3: ""
-    supported:
-      - flac
-      - vqf
-      - mp3
-      - wav
-      - ogg
+      include:
+        - "/Audio/"
+      exclude:
+    format:
+      supported:
+        - .flac
+        - .vqf
+        - .mp3
+        - .wav
+        - .ogg
 
   movie:
     path:
-      mov_path1: "/mnt/storz2_pool/Multimedia/movies/"
-      mov_path2: ""
-      mov_path3: ""
-    supported:
-      - mp4
-      - avi
-      - mkv
-      - m2ts
-      - wmv
-      - mpg
-      - mpeg
-      - divx
-      - iso
+      include:
+        - "/Movies/"
+      exclude:
+    format:
+      supported:
+        - .mp4
+        - .avi
+        - .mkv
+        - .m2ts
+        - .wmv
+        - .mpg
+        - .mpeg
+        - .divx
+        - .iso
+        - .h265
+        - .h264
 
   picture:
     path:
-      pic_path1: "/mnt/storz2_pool/Multimedia/Images/"
-      pic_path2: ""
-      pic_path3: ""
-    supported:
-      - jpg
-      - png
-      - gif
-      - raw
-      - jpeg
-      - bmp
-      - tiff
+      include:
+        - "/Images/"
+      exclude:
+    format:
+      supported:
+        - .jpg
+        - .png
+        - .gif
+        - .raw
+        - .jpeg
+        - .bmp
+        - .tiff
 
   video:
     path:
-      vid_path1: "/mnt/storz2_pool/Multimedia/videos/"
-      vid_path2: ""
-      vid_path3: ""
-    supported:
-      - mp4
-      - avi
-      - mkv
-      - wmv
-      - mpg
-      - mpeg
-      - divx
-      - webm
+      include:
+        - "/Videos/"
+      exclude:
+    format:
+      supported:
+        - .mp4
+        - .avi
+        - .mkv
+        - .wmv
+        - .mpg
+        - .mpeg
+        - .divx
+        - .webm
 
 
