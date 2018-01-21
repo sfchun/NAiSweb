@@ -3,7 +3,7 @@
 ########## Declare section
 
 ConfigFile="config.yml"
-TempDir="/tmp/.NAiSweb" # not used yet
+TempDir="/tmp/.NAiSweb"
 DataDir="NAiSweb_Data"
 # verbose switch : verbose|noverbose
 verbose="noverbose"
@@ -60,7 +60,7 @@ function tag() {
 
 function exit_error() {
   cd "${CurentDir}/";
-  #rm -Rf "${TempDir}"
+  rm -Rf "${TempDir}"
   exit 1
 }
 
@@ -82,7 +82,7 @@ function check_prerequisites_and_cleanup_old_data() {
     if ! mkdir -p "${DataDir}" ; then tag error "Could not find and create ${DataDir} data directory\n"; else tag ok "created ${DataDir} data directory\n"; fi
   fi
   
-  #mkdir -p "${TempDir}"; if [ ! -d "${TempDir}" ]; then tag error "Could not create temporary directory : ${TempDir}\n"; fi
+  mkdir -p "${TempDir}"; if [ ! -d "${TempDir}" ]; then tag error "Could not create temporary directory : ${TempDir}\n"; fi
 
   # check config file
   if [ ! -r "${ConfigFile}" ]; then tag error "Could not read config file : ${ConfigFile}\n"; fi
@@ -90,18 +90,44 @@ function check_prerequisites_and_cleanup_old_data() {
 
 function generate_data_from_paths() {
   string=$1 ; Afiletype=($@)
+  OLDIFS="${IFS}"; IFS=$(echo -en "\n\b") # fix for paths with spaces
 
   # loop file types, if include path is not empty and valide then generate tree in data directory
-  for dtype in ${Afiletype[@]}; do
+  for dtype in "${Afiletype[@]}"; do
     tag info "fetching files from ${dtype}...\n"
+    # get supported formats
+    declare -a Asupformat=($(yaml2json < "${ConfigFile}" | jq -r ".config.${dtype}.supportedformat | .[]" 2>/dev/null))
+    if [ -z "${Asupformat}" ]; then
+      tag warning "no supported format defined, skipping ${dtype} ..."
+    else
+      # get includepaths
+      declare -a Aincludepath=($(yaml2json < "${ConfigFile}" | jq -r ".config.${dtype}.includepath | .[]" 2>/dev/null))
+      if [ -z "${Aincludepath}" ]; then
+        tag warning "no path defined, skipping ${dtype} ..."
+      else
+        # get excludepaths
+        declare -a Aexcludepath=($(yaml2json < "${ConfigFile}" | jq -r ".config.${dtype}.excludepath | .[]" 2>/dev/null))
+
+        tag info "supported format(s) : ${Asupformat[@]}\n"
+        for linclude in "${Aincludepath[@]}"; do
+          tag info "include path -> ${linclude}\n"
+        done
+        if [ ! -z "${Aexcludepath}" ]; then
+          for lexclude in "${Aexcludepath[@]}"; do
+            tag info "exclude path <- ${lexclude}\n"
+          done
+        fi
+      fi
+    fi
   done
 
+  IFS="${OLDIFS}"
 }
 
 function fetch_file_types_and_generate_data_tree() {
   # fetch file types from config.yml
   # Put file types (archive, audio, movie...) in array 
-  declare -a Afiletype=($(yaml2json < "${ConfigFile}" | jq -r '.config | .[] | .filetype'))
+  declare -a Afiletype=($(yaml2json < "${ConfigFile}" | jq -r '.config | .[] | .filetype' 2>/dev/null))
   if [ -z "${Afiletype}" ]; then
     tag error "Error getting file type from config.yml file\n"
   else
@@ -110,7 +136,7 @@ function fetch_file_types_and_generate_data_tree() {
   fi
 
   # and regenerate temp/data directory structure
-  for dtype in ${Afiletype[@]}; do
+  for dtype in "${Afiletype[@]}"; do
     if ! mkdir -p "${DataDir}/${dtype}" ; then tag error "Could not create directory : ${DataDir}/${dtype}\n"; fi
   done
   tag ok "generated data directory structure\n"
@@ -133,5 +159,5 @@ fetch_file_types_and_generate_data_tree
 
 echo ""
 cd "${CurentDir}/"
-#rm -Rf "${TempDir}"
+rm -Rf "${TempDir}"
 echo -e "Enjoy !\n"
